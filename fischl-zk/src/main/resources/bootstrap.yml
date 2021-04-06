@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: fischl-zk
+  cloud:
+    zookeeper:
+      connect-string: 8.129.88.114:2181
