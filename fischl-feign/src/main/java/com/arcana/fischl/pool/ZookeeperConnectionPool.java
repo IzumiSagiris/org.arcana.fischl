@@ -55,7 +55,7 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
                         }
                     });
                     countDownLatch.await();
-                    System.out.println("Thread:" + Thread.currentThread().getId() + "获取连接：" + createCount.incrementAndGet() + "条");
+                    System.out.println("Thread:" + Thread.currentThread().getId() + "get connection:" + createCount.incrementAndGet());
                     busy.offer(zooKeeper);
                     return zooKeeper;
                 } else {
@@ -65,20 +65,20 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
             }
 
             try {
-                System.out.println("Thread:" + Thread.currentThread().getId() + "等待获取空闲资源");
+                System.out.println("Thread:" + Thread.currentThread().getId() + "wait idle resource");
                 Long waitTime = maxWait - (System.currentTimeMillis() - nowTime);
                 zooKeeper = idle.poll(waitTime, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                throw new Exception("等待异常");
+                throw new Exception("wait resource error");
             }
 
             if (zooKeeper != null) {
-                System.out.println("Thread:" + Thread.currentThread().getId() + "获取连接：" + createCount.incrementAndGet() + "条");
+                System.out.println("Thread:" + Thread.currentThread().getId() + "get connection:" + createCount.incrementAndGet());
                 busy.offer(zooKeeper);
                 return zooKeeper;
             } else {
-                System.out.println("Thread:" + Thread.currentThread().getId() + "获取连接超时，请重试！");
-                throw new Exception("Thread:" + Thread.currentThread().getId() + "获取连接超时，请重试！");
+                System.out.println("Thread:" + Thread.currentThread().getId() + "get connection timeout, try again!");
+                throw new Exception("Thread:" + Thread.currentThread().getId() + "get connection timeout, try again!");
             }
         }
         if (!zooKeeper.getState().isConnected()) {
@@ -97,14 +97,14 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
     @Override
     public void release(ZooKeeper connection) throws Exception {
         if (connection == null) {
-            System.out.println("connection 为空");
+            System.out.println("connection is null");
             return;
         }
         if (busy.remove(connection)) {
             idle.offer(connection);
         } else {
             activeSize.decrementAndGet();
-            throw new Exception("释放失败");
+            throw new Exception("release resource failed");
         }
     }
 

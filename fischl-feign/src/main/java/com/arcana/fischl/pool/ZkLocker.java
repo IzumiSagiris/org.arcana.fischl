@@ -26,7 +26,7 @@ public class ZkLocker {
             createRootNode(parentLockPath, poolZK);
             childLockPath = poolZK.create(parentLockPath + "/", "".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE,
                     CreateMode.EPHEMERAL_SEQUENTIAL);
-            if(getLockOrWatchLast(parentLockPath, childLockPath, poolZK)) {
+            if (getLockOrWatchLast(parentLockPath, childLockPath, poolZK)) {
                 System.out.println("getLock: " + childLockPath);
                 return func.apply(childLockPath);
             }
@@ -41,7 +41,7 @@ public class ZkLocker {
 
     private boolean getLockOrWatchLast(String parentLockPath, String childLockPath, ZooKeeper zooKeeper)
             throws KeeperException, InterruptedException {
-        List<String>children = zooKeeper.getChildren(parentLockPath, false);
+        List<String> children = zooKeeper.getChildren(parentLockPath, false);
         Collections.sort(children);
         if ((parentLockPath + "/" + children.get(0)).equals(childLockPath)) {
             return true;
@@ -70,14 +70,14 @@ public class ZkLocker {
             try {
                 zooKeeper.create(LOCKER_ROOT, "".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             } catch (KeeperException e) {
-                System.out.println("创建节点失败 : " + LOCKER_ROOT);
+                System.out.println("create znode failed : " + LOCKER_ROOT);
             }
         }
         if (zooKeeper.exists(parentLockPath, false) == null) {
             try {
                 zooKeeper.create(parentLockPath, "".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             } catch (KeeperException e) {
-                System.out.println("parentLockPath 节点已存在 : " + parentLockPath);
+                System.out.println("parentLockPath already exists : " + parentLockPath);
             }
         }
     }
@@ -87,12 +87,12 @@ public class ZkLocker {
             if (childLockPath != null) {
                 zooKeeper.delete(childLockPath, -1);
             }
-            List<String>children = zooKeeper.getChildren(parentLockPath, false);
+            List<String> children = zooKeeper.getChildren(parentLockPath, false);
             if (children.isEmpty()) {
                 try {
                     zooKeeper.delete(parentLockPath, -1);
                 } catch (KeeperException e) {
-                    System.out.println("节点已存在其他子节点,忽略删除: " + parentLockPath);
+                    System.out.println("lock node already has other children, please ignore the exception: " + parentLockPath);
                 }
             }
         } catch (Exception e) {
