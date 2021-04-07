@@ -81,7 +81,15 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
                 throw new Exception("Thread:" + Thread.currentThread().getId() + "获取连接超时，请重试！");
             }
         }
-
+        if (!zooKeeper.getState().isConnected()) {
+            CountDownLatch recoveryLatch = new CountDownLatch(1);
+            zooKeeper = new ZooKeeper("127.0.0.1:2181:2181,127.0.0.1:2181:2182,127.0.0.1:2181:2183", 5000, (watch) -> {
+                if (watch.getState() == Watcher.Event.KeeperState.SyncConnected) {
+                    recoveryLatch.countDown();
+                }
+            });
+            recoveryLatch.await();
+        }
         busy.offer(zooKeeper);
         return zooKeeper;
     }
