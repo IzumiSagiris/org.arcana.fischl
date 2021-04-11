@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Component
@@ -58,7 +59,7 @@ public class ZkLocker {
         if (zooKeeper.exists(parentLockPath + "/" + last, (watchedEvent -> {
             recoveryLatch.countDown();
         })) != null) {
-            recoveryLatch.await();
+            recoveryLatch.await(60000L, TimeUnit.MILLISECONDS);
             return getLockOrWatchLast(parentLockPath, childLockPath, zooKeeper);
         } else {
             return getLockOrWatchLast(parentLockPath, childLockPath, zooKeeper);

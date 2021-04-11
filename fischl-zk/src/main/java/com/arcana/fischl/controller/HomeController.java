@@ -34,7 +34,6 @@ public class HomeController {
     public String arcana() throws Exception {
         String res = "this is home -> arcana.";
         System.out.println("here");
-        Thread.sleep(2000);
         res += arcanaHomeService.zkservice();
         return res;
     }

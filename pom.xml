@@ -66,6 +66,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -82,17 +86,17 @@
 
     <repositories>
         <repository>
+            <id>spring</id>
+            <name>Spring Aliyun</name>
+            <url>https://maven.aliyun.com/repository/spring</url>
+        </repository>
+        <repository>
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
             <url>https://repo.spring.io/libs-milestone</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>spring</id>
-            <name>Spring Aliyun</name>
-            <url>https://maven.aliyun.com/repository/spring</url>
         </repository>
     </repositories>
 </project>

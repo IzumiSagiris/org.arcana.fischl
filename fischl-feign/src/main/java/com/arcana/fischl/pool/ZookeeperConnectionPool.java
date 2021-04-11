@@ -49,12 +49,12 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
 
                 if (activeSize.incrementAndGet() <= maxActive) {
 
-                    zooKeeper = new ZooKeeper("127.0.0.1:2181:2181,127.0.0.1:2181:2182,127.0.0.1:2181:2183", 5000, (watch) -> {
+                    zooKeeper = new ZooKeeper("8.129.88.114:2181,8.129.88.114:2182,8.129.88.114:2183", 5000, (watch) -> {
                         if (watch.getState() == Watcher.Event.KeeperState.SyncConnected) {
                             countDownLatch.countDown();
                         }
                     });
-                    countDownLatch.await();
+                    countDownLatch.await(60000L, TimeUnit.MILLISECONDS);
                     System.out.println("Thread:" + Thread.currentThread().getId() + "get connection:" + createCount.incrementAndGet());
                     busy.offer(zooKeeper);
                     return zooKeeper;
@@ -83,12 +83,12 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
         }
         if (!zooKeeper.getState().isConnected()) {
             CountDownLatch recoveryLatch = new CountDownLatch(1);
-            zooKeeper = new ZooKeeper("127.0.0.1:2181:2181,127.0.0.1:2181:2182,127.0.0.1:2181:2183", 5000, (watch) -> {
+            zooKeeper = new ZooKeeper("8.129.88.114:2181,8.129.88.114:2182,8.129.88.114:2183", 5000, (watch) -> {
                 if (watch.getState() == Watcher.Event.KeeperState.SyncConnected) {
                     recoveryLatch.countDown();
                 }
             });
-            recoveryLatch.await();
+            recoveryLatch.await(60000L, TimeUnit.MILLISECONDS);
         }
         busy.offer(zooKeeper);
         return zooKeeper;
