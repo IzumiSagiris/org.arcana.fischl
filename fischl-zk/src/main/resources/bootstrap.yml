@@ -3,4 +3,4 @@ spring:
     name: fischl-zk
   cloud:
     zookeeper:
-      connect-string: 8.129.88.114:2181
+      connect-string: 139.196.233.141:2181,139.196.233.141:2182,139.196.233.141:2183

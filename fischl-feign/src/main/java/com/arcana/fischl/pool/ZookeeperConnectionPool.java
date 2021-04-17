@@ -49,17 +49,17 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
 
                 if (activeSize.incrementAndGet() <= maxActive) {
 
-                    zooKeeper = new ZooKeeper("8.129.88.114:2181,8.129.88.114:2182,8.129.88.114:2183", 5000, (watch) -> {
+                    zooKeeper = new ZooKeeper("139.196.233.141:2181,139.196.233.141:2182,139.196.233.141:2183", 5000, (watch) -> {
                         if (watch.getState() == Watcher.Event.KeeperState.SyncConnected) {
                             countDownLatch.countDown();
                         }
                     });
+                    zooKeeper.addAuthInfo("digest", "bob:bobsecret".getBytes());
                     countDownLatch.await(60000L, TimeUnit.MILLISECONDS);
                     System.out.println("Thread:" + Thread.currentThread().getId() + "get connection:" + createCount.incrementAndGet());
                     busy.offer(zooKeeper);
                     return zooKeeper;
                 } else {
-
                     activeSize.decrementAndGet();
                 }
             }
@@ -83,11 +83,12 @@ public class ZookeeperConnectionPool implements ConnectionPool<ZooKeeper> {
         }
         if (!zooKeeper.getState().isConnected()) {
             CountDownLatch recoveryLatch = new CountDownLatch(1);
-            zooKeeper = new ZooKeeper("8.129.88.114:2181,8.129.88.114:2182,8.129.88.114:2183", 5000, (watch) -> {
+            zooKeeper = new ZooKeeper("139.196.233.141:2181,139.196.233.141:2182,139.196.233.141:2183", 5000, (watch) -> {
                 if (watch.getState() == Watcher.Event.KeeperState.SyncConnected) {
                     recoveryLatch.countDown();
                 }
             });
+            zooKeeper.addAuthInfo("digest", "bob:bobsecret".getBytes());
             recoveryLatch.await(60000L, TimeUnit.MILLISECONDS);
         }
         busy.offer(zooKeeper);
